@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: bron-backend
+    build:
+      context: ./backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/usr/src/app
+    networks:
+      - bron-network
+
+  client:
+    container_name: bron-client
+    build:
+      context: ./client
+    ports:
+      - "3000:3000"
+    networks:
+      - bron-network
+    volumes:
+      - ./client:/usr/src/app
+
+  db:
+    image: postgres:13
+    container_name: bron-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bron_booking
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bron-network
+
+volumes:
+  postgres-data:
+
+networks:
+  bron-network:
+    driver: bridge
